@@ -11,10 +11,18 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-const ALLOWED_ORIGIN = process.env.CLIENT_URL || 'http://localhost:5173';
+// If CLIENT_URL exists (Prod), use it. Otherwise localhost.
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174'];
 
 app.use(cors({
-  origin: ALLOWED_ORIGIN, // Uses live URL in prod, localhost in dev
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like Postman) or allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true, 
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
 }));
