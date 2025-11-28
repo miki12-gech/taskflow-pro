@@ -80,11 +80,11 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || "secret", { expiresIn: '7d' });
 
     // FIX: ENSURE path: '/' IS HERE TOO!
-    res.cookie("token", token, {
+  res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" allows Cross-Site (Vercel -> Render)
-      path: "/", // <--- THIS WAS LIKELY MISSING causing the redirect fail
+      secure: true,        // Force Secure (HTTPS)
+      sameSite: "none",    // Force None (Cross-Site)
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
